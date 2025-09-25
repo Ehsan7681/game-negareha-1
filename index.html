@@ -4,15 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نگاره‌ها</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @font-face {
             font-family: 'Vazirmatn';
-            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.3/Vazirmatn-V33.0.3/fonts/webfonts/Vazirmatn-RD/Vazirmatn-RD-Regular.woff2') format('woff2');
+            src: url('/fonts/Vazirmatn-RD-Regular.woff2') format('woff2');
             font-weight: normal;
             font-style: normal;
         }
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('/fonts/Vazirmatn-RD-Bold.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
             background-color: #fdfdfd;
@@ -44,6 +52,12 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 24px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            font-weight: bold;
+            font-size: 1.5rem; /* Large font size for buttons */
         }
         .dark .glass-button {
             background-color: rgba(60, 60, 60, 0.6);
@@ -121,6 +135,20 @@
             color: #fdfdfd;
         }
     </style>
+    <!-- Add manifest and service worker links for PWA functionality -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered! Scope:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('Service Worker registration failed:', err);
+                    });
+            });
+        }
+    </script>
 </head>
 <body class="flex flex-col items-center min-h-screen p-4">
     <!-- Header -->
@@ -133,18 +161,8 @@
         <!-- The main menu with negareh selection buttons -->
         <div id="main-menu" class="p-4">
             <h2 class="text-2xl text-blue-800 font-bold mb-6">یک نگاره را انتخاب کنید</h2>
-            <!-- Change grid to a single column and adjust button width -->
-            <div class="flex flex-col gap-6 justify-center items-center">
-                <button onclick="showNegareh(1)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۱</button>
-                <button onclick="showNegareh(2)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۲</button>
-                <button onclick="showNegareh(3)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۳</button>
-                <button onclick="showNegareh(4)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۴</button>
-                <button onclick="showNegareh(5)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۵</button>
-                <button onclick="showNegareh(6)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۶</button>
-                <button onclick="showNegareh(7)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۷</button>
-                <button onclick="showNegareh(8)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۸</button>
-                <button onclick="showNegareh(9)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۹</button>
-                <button onclick="showNegareh(10)" class="glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6">نگاره ۱۰</button>
+            <div id="main-menu-buttons" class="flex flex-col gap-6 justify-center items-center">
+                <!-- Buttons will be dynamically generated here -->
             </div>
         </div>
 
@@ -230,7 +248,7 @@
                     { name: "چتر", image: "chatr.png", audio: "chatr.mp3" },
                     { name: "چای", image: "chay.png", audio: "chay.mp3" },
                     { name: "باد", image: "bad.png", audio: "bad.mp3" },
-                    { name: "تاب", image: "tab.mp3", audio: "tab.mp3" },
+                    { name: "تاب", image: "tab.png", audio: "tab.mp3" },
                 ]
             },
             7: {
@@ -298,6 +316,8 @@
         const mainNegarehImage = document.getElementById('main-negareh-image');
         const body = document.body;
         const themeToggle = document.getElementById('theme-toggle');
+        const mainMenuButtonsContainer = document.getElementById('main-menu-buttons');
+
 
         // Function to play audio using the Audio element
         function playAudio(negarehNum, audioName) {
@@ -370,6 +390,39 @@
             mainMenu.classList.remove('hidden');
         }
 
+        // Dynamic Main Menu Button Rendering
+        function renderMainMenuButtons() {
+            mainMenuButtonsContainer.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const button = document.createElement('button');
+                const negareh = negarehData[i];
+                if (!negareh) continue;
+
+                button.textContent = `نگاره ${i}`;
+                button.className = `glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6`;
+                button.onclick = () => showNegareh(i);
+                
+                // Add the background image with semi-transparent overlay
+                const imageUrl = `${mainImageBaseUrl}/${negareh.mainImage}`;
+                
+                // Light mode overlay
+                const lightOverlay = 'linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6))';
+                // Dark mode overlay
+                const darkOverlay = 'linear-gradient(rgba(60, 60, 60, 0.6), rgba(60, 60, 60, 0.6))';
+                
+                button.style.backgroundImage = `${lightOverlay}, url('${imageUrl}')`;
+
+                // Add dark mode specific styles for the button
+                if (body.classList.contains('dark')) {
+                    button.style.backgroundImage = `${darkOverlay}, url('${imageUrl}')`;
+                    button.style.color = '#e0e0e0';
+                }
+
+                mainMenuButtonsContainer.appendChild(button);
+            }
+        }
+
+
         // Dark mode toggle functionality
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark');
@@ -377,6 +430,7 @@
             const wordNameElements = document.querySelectorAll('.word-name');
             const negarehTitleElement = document.getElementById('negareh-title');
             const mainMenuTitleElement = document.getElementById('main-menu').querySelector('h2');
+            const mainMenuButtons = document.querySelectorAll('#main-menu-buttons button');
 
             if (isDarkMode) {
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
@@ -387,6 +441,17 @@
                 wordNameElements.forEach(el => {
                     el.classList.add('text-blue-200');
                 });
+
+                // Update background of main menu buttons for dark mode
+                mainMenuButtons.forEach((button, index) => {
+                    const negareh = negarehData[index + 1];
+                    if (negareh) {
+                        const imageUrl = `${mainImageBaseUrl}/${negareh.mainImage}`;
+                        const darkOverlay = 'linear-gradient(rgba(60, 60, 60, 0.6), rgba(60, 60, 60, 0.6))';
+                        button.style.backgroundImage = `${darkOverlay}, url('${imageUrl}')`;
+                        button.style.color = '#e0e0e0';
+                    }
+                });
             } else {
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
                 negarehTitleElement.classList.remove('text-gray-200');
@@ -396,9 +461,25 @@
                 wordNameElements.forEach(el => {
                     el.classList.remove('text-blue-200');
                 });
+                
+                // Update background of main menu buttons for light mode
+                mainMenuButtons.forEach((button, index) => {
+                    const negareh = negarehData[index + 1];
+                    if (negareh) {
+                        const imageUrl = `${mainImageBaseUrl}/${negareh.mainImage}`;
+                        const lightOverlay = 'linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6))';
+                        button.style.backgroundImage = `${lightOverlay}, url('${imageUrl}')`;
+                        button.style.color = '#1e40af';
+                    }
+                });
             }
         });
 
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMainMenuButtons();
+            showMainMenu();
+        });
     </script>
 </body>
 </html>
