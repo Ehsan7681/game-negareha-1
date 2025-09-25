@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>نگاره‌ها</title>
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -63,8 +63,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            backdrop-filter: blur(1px) saturate(150%); /* Reduced blur */
-            -webkit-backdrop-filter: blur(1px) saturate(150%); /* Reduced blur */
+            backdrop-filter: blur(1px) saturate(150%);
+            -webkit-backdrop-filter: blur(1px) saturate(150%);
             background-color: rgba(255, 255, 255, 0.6);
             z-index: 1;
             transition: background-color 0.3s ease;
@@ -166,15 +166,15 @@
 </head>
 <body class="flex flex-col items-center min-h-screen p-4">
     <!-- Header -->
-    <header class="w-full text-gray-800 text-center py-4 rounded-lg glass-container" style="background-color: #f5f5f5;">
-        <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide">بازی نگاره‌ها</h1>
+    <header class="w-full text-center py-4 rounded-lg glass-container bg-gray-100 dark:bg-white dark:text-gray-800">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide text-gray-800">بازی نگاره‌ها</h1>
     </header>
 
     <!-- Main Content Area -->
     <main id="content-area" class="w-full container rounded-lg p-6 shadow-xl text-center mt-6 glass-container">
         <!-- The main menu with negareh selection buttons -->
         <div id="main-menu" class="p-4">
-            <h2 class="text-2xl text-blue-800 font-bold mb-6">یک نگاره را انتخاب کنید</h2>
+            <h2 class="text-2xl text-blue-800 dark:text-gray-200 font-bold mb-6">یک نگاره را انتخاب کنید</h2>
             <div id="main-menu-buttons" class="flex flex-col gap-6 justify-center items-center">
                 <!-- Buttons will be dynamically generated here -->
             </div>
@@ -185,7 +185,7 @@
             <button onclick="showMainMenu()" class="back-button bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg mb-6 flex items-center mx-auto">
                 <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i> بازگشت به منو
             </button>
-            <h2 id="negareh-title" class="text-3xl text-blue-800 font-bold mb-6"></h2>
+            <h2 id="negareh-title" class="text-3xl text-blue-800 dark:text-gray-200 font-bold mb-6"></h2>
             <img id="main-negareh-image" class="w-full rounded-lg mb-6 glass-container">
             <div id="word-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-center"></div>
         </div>
@@ -456,8 +456,8 @@
                 wordNameElements.forEach(el => {
                     el.classList.add('text-blue-200');
                 });
-                mainHeader.style.backgroundColor = '#2c2c2c';
-                
+                mainHeader.style.backgroundColor = 'white'; /* Changed to white */
+                mainHeader.style.color = '#1f2937';
             } else {
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
                 negarehTitleElement.classList.remove('text-gray-200');
@@ -468,6 +468,7 @@
                     el.classList.remove('text-blue-200');
                 });
                 mainHeader.style.backgroundColor = '#f5f5f5';
+                mainHeader.style.color = '#1f2937';
             }
         });
 
