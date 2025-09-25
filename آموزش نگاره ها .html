@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نگاره‌ها</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'B Nazanin';
+            src: url('https://db.rastikerdar.com/fonts/b-nazanin/b-nazanin.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'B Nazanin', sans-serif;
+            background-color: #fce7f3;
+        }
+        .container {
+            max-width: 1024px;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        .speech-icon {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .speech-icon:hover {
+            transform: scale(1.1);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #f472b6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen p-4">
+    <!-- Header -->
+    <header class="w-full bg-pink-400 text-white text-center py-4 rounded-b-3xl">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide">بازی نگاره‌ها</h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="w-full max-w-4xl overflow-x-auto my-6 bg-pink-200 rounded-full shadow-lg">
+        <div class="flex justify-start md:justify-center p-2 space-x-2 md:space-x-4">
+            <!-- Navigation buttons for each negareh -->
+            <button onclick="showNegareh(1)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۱</button>
+            <button onclick="showNegareh(2)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۲</button>
+            <button onclick="showNegareh(3)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۳</button>
+            <button onclick="showNegareh(4)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۴</button>
+            <button onclick="showNegareh(5)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۵</button>
+            <button onclick="showNegareh(6)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۶</button>
+            <button onclick="showNegareh(7)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۷</button>
+            <button onclick="showNegareh(8)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۸</button>
+            <button onclick="showNegareh(9)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۹</button>
+            <button onclick="showNegareh(10)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex-shrink-0">نگاره ۱۰</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="content-area" class="w-full container bg-white rounded-lg p-6 shadow-xl text-center">
+        <!-- Content will be dynamically loaded here -->
+        <h2 id="negareh-title" class="text-3xl text-pink-700 font-bold mb-6"></h2>
+        <div id="word-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-center"></div>
+        <div id="loading-indicator" class="mt-8 hidden flex justify-center items-center">
+            <div class="loading-spinner"></div>
+            <span class="mr-4 text-gray-500">در حال بارگذاری...</span>
+        </div>
+    </main>
+
+    <script>
+        // Define the data for each negareh
+        const negarehData = {
+            1: {
+                title: "نگاره ۱: به خانه ما خوش آمدی",
+                words: [
+                    { name: "امین", image: "amin.png", audio: "amin.mp3" },
+                    { name: "آزاده", image: "azadeh.png", audio: "azadeh.mp3" },
+                    { name: "مادر", image: "madr.png", audio: "madr.mp3" },
+                    { name: "بابا", image: "baba.png", audio: "baba.mp3" },
+                ]
+            },
+            2: {
+                title: "نگاره ۲: بچه‌ها، آماده!",
+                words: [
+                    { name: "آزاده", image: "azadeh.png", audio: "azadeh.mp3" },
+                    { name: "کیف", image: "kif.png", audio: "kif.mp3" },
+                    { name: "کفش", image: "kafsh.png", audio: "kafsh.mp3" },
+                    { name: "کتاب", image: "ketab.png", audio: "ketab.mp3" },
+                    { name: "آبی", image: "abi.png", audio: "abi.mp3" },
+                ]
+            },
+            3: {
+                title: "نگاره ۳: یک، دو، سه، راه مدرسه",
+                words: [
+                    { name: "مدرسه", image: "madrese.png", audio: "madrese.mp3" },
+                    { name: "مسجد", image: "masjed.png", audio: "masjed.mp3" },
+                    { name: "آزاده", image: "azadeh.png", audio: "azadeh.mp3" },
+                    { name: "آب", image: "ab.png", audio: "ab.mp3" },
+                ]
+            },
+            4: {
+                title: "نگاره ۴: به مدرسه رسیدیم",
+                words: [
+                    { name: "مدیر", image: "modir.png", audio: "modir.mp3" },
+                    { name: "مدرسه", image: "madrese.png", audio: "madrese.mp3" },
+                    { name: "کتاب", image: "ketab.png", audio: "ketab.mp3" },
+                    { name: "آب", image: "ab.png", audio: "ab.mp3" },
+                    { name: "کلاس", image: "kelas.png", audio: "kelas.mp3" },
+                ]
+            },
+            5: {
+                title: "نگاره ۵: از کلاس ما چه خبر؟",
+                words: [
+                    { name: "مداد", image: "medad.png", audio: "medad.mp3" },
+                    { name: "پرچم", image: "parcham.png", audio: "parcham.mp3" },
+                    { name: "امام", image: "emam.png", audio: "emam.mp3" },
+                    { name: "آبی", image: "abi.png", audio: "abi.mp3" },
+                    { name: "نیمکت", image: "nimkat.png", audio: "nimkat.mp3" },
+                    { name: "میز", image: "miz.png", audio: "miz.mp3" },
+                ]
+            },
+            6: {
+                title: "نگاره ۶: بازی، بازی، تماشا",
+                words: [
+                    { name: "بادکنک", image: "badkonak.png", audio: "badkonak.mp3" },
+                    { name: "آب", image: "ab.png", audio: "ab.mp3" },
+                    { name: "چتر", image: "chatr.png", audio: "chatr.mp3" },
+                    { name: "چای", image: "chay.png", audio: "chay.mp3" },
+                    { name: "باد", image: "bad.png", audio: "bad.mp3" },
+                    { name: "تاب", image: "tab.png", audio: "tab.mp3" },
+                ]
+            },
+            7: {
+                title: "نگاره ۷: به به چه روستایی!",
+                words: [
+                    { name: "گاو", image: "gav.png", audio: "gav.mp3" },
+                    { name: "اتاق", image: "otagh.png", audio: "otagh.mp3" },
+                    { name: "سرو", image: "sarv.png", audio: "sarv.mp3" },
+                    { name: "اردک", image: "ordak.png", audio: "ordak.mp3" },
+                    { name: "رودخانه", image: "roodkhane.png", audio: "roodkhane.mp3" },
+                    { name: "علف", image: "alaf.png", audio: "alaf.mp3" },
+                    { name: "برف", image: "barf.png", audio: "barf.mp3" },
+                    { name: "پل", image: "pol.png", audio: "pol.mp3" },
+                    { name: "گوسفند", image: "goosfand.png", audio: "goosfand.mp3" },
+                ]
+            },
+            8: {
+                title: "نگاره ۸: چه دنیای قشنگی!",
+                words: [
+                    { name: "خرگوش", image: "khargoosh.png", audio: "khargoosh.mp3" },
+                    { name: "گرگ", image: "gorg.png", audio: "gorg.mp3" },
+                    { name: "شیر", image: "shir.png", audio: "shir.mp3" },
+                    { name: "خرس", image: "khers.png", audio: "khers.mp3" },
+                    { name: "شتر", image: "shotor.png", audio: "shotor.mp3" },
+                    { name: "گوزن", image: "gavazn.png", audio: "gavazn.mp3" },
+                ]
+            },
+            9: {
+                title: "نگاره ۹: در مسجد محله",
+                words: [
+                    { name: "قرآن", image: "quran.png", audio: "quran.mp3" },
+                    { name: "مسجد", image: "masjed.png", audio: "masjed.mp3" },
+                    { name: "پنجره", image: "panjere.png", audio: "panjere.mp3" },
+                    { name: "پرده", image: "parde.png", audio: "parde.mp3" },
+                    { name: "اذان", image: "azan.png", audio: "azan.mp3" },
+                    { name: "جانماز", image: "janamaz.png", audio: "janamaz.mp3" },
+                ]
+            },
+            10: {
+                title: "نگاره ۱۰: نوروز در خانه ما",
+                words: [
+                    { name: "سبزه", image: "sabze.png", audio: "sabze.mp3" },
+                    { name: "قرآن", image: "quran.png", audio: "quran.mp3" },
+                    { name: "سیب", image: "sib.png", audio: "sib.mp3" },
+                    { name: "سنجد", image: "senjed.png", audio: "senjed.mp3" },
+                    { name: "سمنو", image: "samanoo.png", audio: "samanoo.mp3" },
+                    { name: "سرکه", image: "serke.png", audio: "serke.mp3" },
+                    { name: "سکه", image: "sekke.png", audio: "sekke.mp3" },
+                    { name: "سیر", image: "sir.png", audio: "sir.mp3" },
+                ]
+            }
+        };
+
+        const imageBaseUrl = 'images/negare';
+        const audioBaseUrl = 'audio/negare';
+        const wordContainer = document.getElementById('word-container');
+        const negarehTitle = document.getElementById('negareh-title');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let currentAudioSource = null;
+
+        // Function to show loading spinner
+        function showLoading() {
+            wordContainer.style.display = 'none';
+            loadingIndicator.style.display = 'flex';
+        }
+
+        // Function to hide loading spinner
+        function hideLoading() {
+            loadingIndicator.style.display = 'none';
+            wordContainer.style.display = 'grid';
+        }
+
+        // Function to play audio
+        async function playAudio(negarehNum, audioName) {
+            if (currentAudioSource) {
+                currentAudioSource.stop();
+            }
+
+            const audioUrl = `${audioBaseUrl}${negarehNum}/${audioName}`;
+            
+            try {
+                const response = await fetch(audioUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to load audio: ${response.statusText}`);
+                }
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioContext.destination);
+                source.start();
+                currentAudioSource = source;
+
+            } catch (error) {
+                console.error("Error playing audio:", error);
+                // Use custom modal instead of alert
+                showModal('خطا در پخش صدا', `فایل صوتی "${audioName}" در مسیر "${audioUrl}" پیدا نشد یا فرمت آن پشتیبانی نمی‌شود.`);
+            }
+        }
+
+        // Function to show a custom modal (replaces alert)
+        function showModal(title, message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8 w-11/12 md:w-1/2 lg:w-1/3 text-center transition-all transform scale-95">
+                    <h3 class="text-xl font-bold mb-4 text-pink-600">${title}</h3>
+                    <p class="text-gray-700 mb-6">${message}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded-full transition-colors">بستن</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Function to render the words for a specific negareh
+        function renderWords(data, negarehNum) {
+            wordContainer.innerHTML = '';
+            data.words.forEach(word => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'card bg-pink-100 p-4 rounded-xl flex flex-col items-center justify-center text-center transition-all duration-300 transform hover:scale-105';
+
+                const image = document.createElement('img');
+                image.src = `${imageBaseUrl}${negarehNum}/${word.image}`;
+                image.alt = word.name;
+                image.className = 'w-28 h-28 object-contain rounded-lg mb-2 shadow-inner';
+                wordCard.appendChild(image);
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'text-xl md:text-2xl font-bold text-pink-800 mb-2';
+                nameDiv.textContent = word.name;
+                wordCard.appendChild(nameDiv);
+
+                const speakerButton = document.createElement('button');
+                speakerButton.className = 'speech-icon text-3xl text-pink-500 hover:text-pink-600';
+                speakerButton.innerHTML = `<i class="fa-solid fa-volume-up"></i>`;
+                speakerButton.onclick = () => playAudio(negarehNum, word.audio);
+                wordCard.appendChild(speakerButton);
+
+                wordContainer.appendChild(wordCard);
+            });
+        }
+
+        // Function to show a negareh
+        function showNegareh(negarehNum) {
+            const data = negarehData[negarehNum];
+            if (data) {
+                negarehTitle.textContent = data.title;
+                renderWords(data, negarehNum);
+            } else {
+                negarehTitle.textContent = "نگاره مورد نظر یافت نشد.";
+                wordContainer.innerHTML = "";
+            }
+        }
+
+        // Load the first negareh on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            showNegareh(1);
+        });
+    </script>
+</body>
+</html>
