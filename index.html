@@ -45,23 +45,35 @@
         }
 
         .glass-button {
-            backdrop-filter: blur(10px) saturate(150%);
-            -webkit-backdrop-filter: blur(10px) saturate(150%);
-            background-color: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 24px;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            
             font-weight: bold;
-            font-size: 1.5rem; /* Large font size for buttons */
+            font-size: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
-        .dark .glass-button {
+        .glass-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(1px) saturate(150%); /* Reduced blur */
+            -webkit-backdrop-filter: blur(1px) saturate(150%); /* Reduced blur */
+            background-color: rgba(255, 255, 255, 0.6);
+            z-index: 1;
+            transition: background-color 0.3s ease;
+        }
+        .dark .glass-button::before {
             background-color: rgba(60, 60, 60, 0.6);
-            border: 1px solid rgba(70, 70, 70, 0.4);
+        }
+
+        .dark .glass-button {
             color: #e0e0e0;
         }
         .dark .glass-button:hover {
@@ -69,9 +81,12 @@
         }
         
         .glass-button:hover {
-            background-color: rgba(255, 255, 255, 0.8);
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        .glass-button span {
+            position: relative;
+            z-index: 2;
         }
 
         .back-button {
@@ -107,12 +122,11 @@
         
         /* Dark mode specific text color for word names */
         .dark .word-name {
-            color: #93c5fd; /* Light blue color */
+            color: #93c5fd;
         }
         .word-name {
-            color: #1e40af; /* Dark blue color */
+            color: #1e40af;
         }
-
 
         .toggle-button {
             position: fixed;
@@ -183,6 +197,11 @@
     </button>
 
     <script>
+        const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        function toPersianNumber(number) {
+            return String(number).split('').map(digit => persianNumbers[digit]).join('');
+        }
+
         // Define the data for each negareh
         const negarehData = {
             1: {
@@ -248,7 +267,7 @@
                     { name: "چتر", image: "chatr.png", audio: "chatr.mp3" },
                     { name: "چای", image: "chay.png", audio: "chay.mp3" },
                     { name: "باد", image: "bad.png", audio: "bad.mp3" },
-                    { name: "تاب", image: "tab.png", audio: "tab.mp3" },
+                    { name: "تاب", image: "tab.mp3", audio: "tab.mp3" },
                 ]
             },
             7: {
@@ -397,24 +416,19 @@
                 const button = document.createElement('button');
                 const negareh = negarehData[i];
                 if (!negareh) continue;
-
-                button.textContent = `نگاره ${i}`;
-                button.className = `glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 font-bold py-4 px-6`;
+                
+                button.className = `glass-button w-full sm:w-2/3 md:w-1/2 text-blue-800 py-4 px-6`;
                 button.onclick = () => showNegareh(i);
+                
+                // Use a span for the text to prevent blur
+                button.innerHTML = `<span>نگــــــــــاره ${toPersianNumber(i)}</span>`;
                 
                 // Add the background image with semi-transparent overlay
                 const imageUrl = `${mainImageBaseUrl}/${negareh.mainImage}`;
-                
-                // Light mode overlay
-                const lightOverlay = 'linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6))';
-                // Dark mode overlay
-                const darkOverlay = 'linear-gradient(rgba(60, 60, 60, 0.6), rgba(60, 60, 60, 0.6))';
-                
-                button.style.backgroundImage = `${lightOverlay}, url('${imageUrl}')`;
+                button.style.backgroundImage = `url('${imageUrl}')`;
 
                 // Add dark mode specific styles for the button
                 if (body.classList.contains('dark')) {
-                    button.style.backgroundImage = `${darkOverlay}, url('${imageUrl}')`;
                     button.style.color = '#e0e0e0';
                 }
 
@@ -431,7 +445,8 @@
             const negarehTitleElement = document.getElementById('negareh-title');
             const mainMenuTitleElement = document.getElementById('main-menu').querySelector('h2');
             const mainMenuButtons = document.querySelectorAll('#main-menu-buttons button');
-
+            const mainHeader = document.querySelector('header');
+            
             if (isDarkMode) {
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
                 negarehTitleElement.classList.remove('text-blue-800');
@@ -441,17 +456,8 @@
                 wordNameElements.forEach(el => {
                     el.classList.add('text-blue-200');
                 });
-
-                // Update background of main menu buttons for dark mode
-                mainMenuButtons.forEach((button, index) => {
-                    const negareh = negarehData[index + 1];
-                    if (negareh) {
-                        const imageUrl = `${mainImageBaseUrl}/${negareh.mainImage}`;
-                        const darkOverlay = 'linear-gradient(rgba(60, 60, 60, 0.6), rgba(60, 60, 60, 0.6))';
-                        button.style.backgroundImage = `${darkOverlay}, url('${imageUrl}')`;
-                        button.style.color = '#e0e0e0';
-                    }
-                });
+                mainHeader.style.backgroundColor = '#2c2c2c';
+                
             } else {
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
                 negarehTitleElement.classList.remove('text-gray-200');
@@ -461,17 +467,7 @@
                 wordNameElements.forEach(el => {
                     el.classList.remove('text-blue-200');
                 });
-                
-                // Update background of main menu buttons for light mode
-                mainMenuButtons.forEach((button, index) => {
-                    const negareh = negarehData[index + 1];
-                    if (negareh) {
-                        const imageUrl = `${mainImageBaseUrl}/${negareh.mainImage}`;
-                        const lightOverlay = 'linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6))';
-                        button.style.backgroundImage = `${lightOverlay}, url('${imageUrl}')`;
-                        button.style.color = '#1e40af';
-                    }
-                });
+                mainHeader.style.backgroundColor = '#f5f5f5';
             }
         });
 
