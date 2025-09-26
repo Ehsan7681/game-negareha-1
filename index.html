@@ -167,7 +167,7 @@
 <body class="flex flex-col items-center min-h-screen p-4">
     <!-- Header -->
     <header class="w-full text-center py-4 rounded-lg glass-container bg-gray-100 dark:bg-white dark:text-gray-800">
-        <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide text-gray-800">بازی نگاره‌ها</h1>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide text-gray-800 dark:text-black">بازی نگاره‌ها</h1>
         <p class="text-xs text-gray-500 mt-2 dark:text-gray-700">ایده و تولید: احسان شمسی</p>
     </header>
 
@@ -183,12 +183,28 @@
 
         <!-- The reading section for a specific negareh -->
         <div id="negareh-section" class="hidden p-4">
-            <button onclick="showMainMenu()" class="back-button bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg mb-6 flex items-center mx-auto">
-                <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i> بازگشت به منو
-            </button>
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <button onclick="showMainMenu()" class="back-button bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg flex items-center">
+                    <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i> بازگشت به منو
+                </button>
+                <!-- Mode Toggle Button -->
+                <div class="flex space-x-2 space-x-reverse dark:bg-gray-700 bg-gray-200 p-1 rounded-full shadow-inner">
+                    <button id="mode-reading" onclick="setMode('reading')" class="py-2 px-4 rounded-full text-sm font-bold transition-colors duration-200 dark:text-gray-200">تصویرخوانی</button>
+                    <button id="mode-practice" onclick="setMode('practice')" class="py-2 px-4 rounded-full text-sm font-bold transition-colors duration-200 dark:text-gray-200">تمرین روان‌خوانی</button>
+                </div>
+            </div>
+
             <h2 id="negareh-title" class="text-3xl text-blue-800 dark:text-gray-200 font-bold mb-6"></h2>
-            <img id="main-negareh-image" class="w-full rounded-lg mb-6 glass-container">
-            <div id="word-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-center"></div>
+            
+            <!-- Content based on mode -->
+            <div id="reading-content">
+                <img id="main-negareh-image" class="w-full rounded-lg mb-6 glass-container">
+                <div id="word-container-reading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 justify-center"></div>
+            </div>
+
+            <div id="practice-content" class="hidden">
+                <div id="word-container-practice" class="flex flex-col gap-4 items-center mt-8"></div>
+            </div>
         </div>
     </main>
 
@@ -329,7 +345,10 @@
         const imageBaseUrl = 'images/negare';
         const audioBaseUrl = 'audio/negare';
         const mainImageBaseUrl = 'images/main_negareh';
-        const wordContainer = document.getElementById('word-container');
+        const wordContainerReading = document.getElementById('word-container-reading');
+        const wordContainerPractice = document.getElementById('word-container-practice');
+        const readingContent = document.getElementById('reading-content');
+        const practiceContent = document.getElementById('practice-content');
         const negarehTitle = document.getElementById('negareh-title');
         const mainMenu = document.getElementById('main-menu');
         const negarehSection = document.getElementById('negareh-section');
@@ -337,6 +356,7 @@
         const body = document.body;
         const themeToggle = document.getElementById('theme-toggle');
         const mainMenuButtonsContainer = document.getElementById('main-menu-buttons');
+        let currentNegarehNum = 1;
 
 
         // Function to play audio using the Audio element
@@ -362,9 +382,9 @@
             document.body.appendChild(modal);
         }
 
-        // Function to render the words for a specific negareh
-        function renderWords(data, negarehNum) {
-            wordContainer.innerHTML = '';
+        // Function to render the words for "Reading" mode (with image)
+        function renderReadingWords(data, negarehNum) {
+            wordContainerReading.innerHTML = '';
             data.words.forEach(word => {
                 const wordCard = document.createElement('div');
                 wordCard.className = 'card bg-blue-100 p-4 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-300 transform hover:scale-105';
@@ -386,19 +406,65 @@
                 speakerButton.onclick = () => playAudio(negarehNum, word.audio);
                 wordCard.appendChild(speakerButton);
 
-                wordContainer.appendChild(wordCard);
+                wordContainerReading.appendChild(wordCard);
             });
+        }
+        
+        // Function to render the words for "Practice" mode (text and audio only)
+        function renderPracticeWords(data, negarehNum) {
+            wordContainerPractice.innerHTML = '';
+            data.words.forEach(word => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'card bg-blue-100 p-4 rounded-lg flex justify-between items-center text-center transition-all duration-300 w-full sm:w-2/3 md:w-1/2';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'word-name text-2xl md:text-3xl font-bold';
+                nameDiv.textContent = word.name;
+                wordCard.appendChild(nameDiv);
+
+                const speakerButton = document.createElement('button');
+                speakerButton.className = 'speech-icon text-4xl text-blue-500 hover:text-blue-600 p-2 rounded-full';
+                speakerButton.innerHTML = `<i class="fa-solid fa-microphone-lines"></i>`; // Using a different icon for practice/audio focus
+                speakerButton.onclick = () => playAudio(negarehNum, word.audio);
+                wordCard.appendChild(speakerButton);
+
+                wordContainerPractice.appendChild(wordCard);
+            });
+        }
+
+        // Sets the current mode (reading or practice)
+        function setMode(mode) {
+            const modeReadingBtn = document.getElementById('mode-reading');
+            const modePracticeBtn = document.getElementById('mode-practice');
+
+            // Reset button styles
+            modeReadingBtn.classList.remove('bg-blue-500', 'text-white', 'dark:bg-blue-600', 'dark:text-white');
+            modePracticeBtn.classList.remove('bg-blue-500', 'text-white', 'dark:bg-blue-600', 'dark:text-white');
+            
+            // Set styles based on mode
+            if (mode === 'reading') {
+                modeReadingBtn.classList.add('bg-blue-500', 'text-white', 'dark:bg-blue-600', 'dark:text-white');
+                readingContent.classList.remove('hidden');
+                practiceContent.classList.add('hidden');
+            } else if (mode === 'practice') {
+                modePracticeBtn.classList.add('bg-blue-500', 'text-white', 'dark:bg-blue-600', 'dark:text-white');
+                readingContent.classList.add('hidden');
+                practiceContent.classList.remove('hidden');
+            }
         }
 
         // Function to show a negareh section and hide the main menu
         function showNegareh(negarehNum) {
+            currentNegarehNum = negarehNum;
             const data = negarehData[negarehNum];
             if (data) {
                 negarehTitle.textContent = data.title;
                 mainNegarehImage.src = `${mainImageBaseUrl}/${data.mainImage}`;
-                renderWords(data, negarehNum);
+                renderReadingWords(data, negarehNum);
+                renderPracticeWords(data, negarehNum); // Render practice words too
                 mainMenu.classList.add('hidden');
                 negarehSection.classList.remove('hidden');
+                setMode('reading'); // Default to reading mode
             } else {
                 showModal('خطا', 'نگاره مورد نظر یافت نشد.');
             }
@@ -445,7 +511,6 @@
             const wordNameElements = document.querySelectorAll('.word-name');
             const negarehTitleElement = document.getElementById('negareh-title');
             const mainMenuTitleElement = document.getElementById('main-menu').querySelector('h2');
-            const mainMenuButtons = document.querySelectorAll('#main-menu-buttons button');
             const mainHeader = document.querySelector('header');
             
             if (isDarkMode) {
@@ -471,6 +536,8 @@
                 mainHeader.style.backgroundColor = '#f5f5f5';
                 mainHeader.style.color = '#1f2937';
             }
+            // Reapply mode styles after theme change to ensure button colors are correct
+            setMode(readingContent.classList.contains('hidden') ? 'practice' : 'reading');
         });
 
         // Initial render
